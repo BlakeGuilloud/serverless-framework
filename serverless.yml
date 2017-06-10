@@ -1,0 +1,42 @@
+service: serverless-things
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: us-west-2
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+      Resource: "arn:aws:dynamodb:us-west-2:055809122680:table/foods"
+
+functions:
+  cat:
+    handler: hello-world/index.hello
+  dog:
+    handler: handler.hello
+    events:
+      - http:
+          path: users/fetch
+          method: get
+
+  send-message:
+    handler: message.send
+    package:
+      include:
+        - node_modules/**
+    events:
+      - http:
+          path: message/send
+          method: post
+    environment:
+      ACCOUNT_SID: ''
+      ACCOUNT_TOKEN: ''
+      FROM_NUMBER: ''
+
+plugins:
+  - serverless-plugin-optimize
